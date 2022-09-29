@@ -1,0 +1,46 @@
+﻿@model MySchedulerWork.Models.Subject
+
+@{
+    ViewData["Title"] = "Create";
+    var model = ViewBag.Error;
+    var error = "";
+
+
+    if (model != null)
+    {
+        error = model.ErrorMessage;
+    }
+}
+
+
+
+<h4>Добавити предмет</h4>
+<hr />
+<div class="border container" style="padding:30px;">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger">@error</span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Course" class="control-label"></label>
+                <input asp-for="Course" class="form-control" />
+                <span asp-validation-for="Course" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Створити" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">На головну</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

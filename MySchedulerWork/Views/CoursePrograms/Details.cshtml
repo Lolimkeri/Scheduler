@@ -1,0 +1,114 @@
+﻿@model MySchedulerWork.Models.CourseProgram
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>@Html.DisplayFor(model => model.Name)</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+            <p>
+                @Html.ActionLink("Додати", "Create", "Program_Subject", new { id = Model.Id }, htmlAttributes: new { @class = "btn btn-success" })
+
+            </p>
+            <table class="table">
+                <thead>
+                    <tr class="table-first-line">
+                        <th scope="col">
+                            Назва
+                        </th>
+                        <th scope="col">
+                            Тип
+                        </th>
+                        <th scope="col">
+                            Викладач
+                        </th>
+                        
+
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ViewBag.ProgSubj as List<Program_Subject>)
+                    {
+                        <tr>
+                            <td>
+                                @item.Subject.Name
+                            </td>
+
+                            <td>
+                                @item.Type
+                            </td>
+                            <td>
+                                @item.MainTeacher.ToShortString()
+                            </td>
+                           
+
+                            <td>
+                                @*<a asp-action="Edit" asp-controller="Program_Subject" asp-route-id="@item.Id" class="btn btn-primary">Ред.</a>*@
+                                <a asp-action="Delete" asp-controller="Program_Subject" asp-route-id="@item.Id" class="btn btn-danger">Видалити</a>
+                                @*@Html.ActionLink("Ред.", "Edit", "Program_Subject", new { id = @item.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+                                @Html.ActionLink("Видалити", "Delete", "Program_Subject", new { id = @item.Id }, htmlAttributes: new { @class = "btn btn-danger" })*@
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-3">
+            <form asp-action="CreateProgToGroup">
+                @Html.DropDownList("groupid", ViewBag.Groups as SelectList, "Виберіть групу", new { @class = "form-control" })
+                <div class="form-group">
+                    <input name="courseid" value="@Model.Id" class="form-control hidden" />
+                </div><div class="form-group">
+                    <input type="submit" value="Добавити групу" class="btn btn-success" />
+                </div>
+            </form>
+
+            <table class="table">
+                <thead>
+                    <tr class="table-first-line">
+                        <th scope="col">
+                            Назва
+                        </th>
+                        <th scope="col">
+                            К-сть студентів
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ViewBag.ProgToGroup)
+                    {
+                        <tr>
+                            <td>
+                                @item.Name
+                            </td>
+                            <td>
+                                @item.AmountOfStudents
+                            </td>
+                            <td>
+                                <!-- <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>-->
+                                <form asp-action="DeleteProgrameToGroup">
+                                    <div class="form-group">
+                                        <input name="idGr" value=" @item.Id" class="form-control hidden" />
+                                    </div>
+                                    <div class="form-group">
+                                        <input name="returnid" value="@Model.Id" class="form-control hidden" />
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="submit" value="Видалити" class="btn btn-danger" />
+                                    </div>
+                                         </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

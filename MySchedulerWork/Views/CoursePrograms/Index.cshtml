@@ -1,0 +1,46 @@
+﻿
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Програми</h1>
+
+<p>
+    @Html.ActionLink("Створити", "Create", "CoursePrograms", new { }, htmlAttributes: new { @class = "btn btn-success" })
+
+</p>
+<table class="table">
+    <thead>
+        <tr class="table-first-line">
+            <th scope="col">
+                Назва
+            </th>
+            <th scope="col">
+                Курс
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in ViewBag.CoursePrograms)
+        {
+            <tr>
+                <td>
+                    @item.Name
+                </td>
+                <td>
+                    @item.Course
+                </td>
+                <td>
+                    <a asp-action="Details" asp-controller="CoursePrograms" asp-route-id="@item.Id" class="btn btn-warning">Детальніше</a>
+                    <a asp-action="Edit" asp-controller="CoursePrograms" asp-route-id="@item.Id" class="btn btn-primary">Редагувати</a>
+                    <a asp-action="Delete" asp-controller="CoursePrograms" asp-route-id="@item.Id" class="btn btn-danger">Видалити</a>
+                    @*@Html.ActionLink("Редагувати", "Edit", "CoursePrograms", new { id = @item.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+                    @Html.ActionLink("Детальніше", "Details", "CoursePrograms", new { id = @item.Id }, htmlAttributes: new { @class = "btn btn-warning" })
+                    @Html.ActionLink("Видалити", "Delete", "CoursePrograms", new { id = @item.Id }, htmlAttributes: new { @class = "btn btn-danger" })*@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

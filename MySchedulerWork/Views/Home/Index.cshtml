@@ -1,0 +1,222 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
+<ul class="nav nav-pills mb-4" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Групи</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Викладачі</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#pills-contact" type="button" role="tab" aria-controls="pills-contact" aria-selected="false">Предмети</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#pills-audience" type="button" role="tab" aria-controls="pills-audience" aria-selected="false">Аудиторії</button>
+    </li>
+</ul>
+<div class="tab-content" id="pills-tabContent">
+    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+        <a asp-action="Create" asp-controller="Groups" class="btn btn-success " style="margin-bottom: 15px">
+            Створити
+        </a>
+        @*<p>
+            @Html.ActionLink("Створити", "Create", "Groups", new { }, htmlAttributes: new { @class = "btn btn-success" })
+
+        </p>*@
+    <div class="scrollit">
+        <table class="table">
+            <thead>
+                <tr class="table-first-line">
+                    <th scope="col">
+                        Назва
+                    </th>
+                    <th scope="col">
+                        Курс
+                    </th>
+                    <th scope="col">
+                        К-сть студентів
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in ViewBag.Groups)
+                {
+                    <tr>
+                        <td>
+                            @item.Name
+                        </td>
+                        <td>
+                            @item.Course
+                        </td>
+                        <td>
+                            @item.AmountOfStudents
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-controller="Groups" asp-route-id="@item.Id" class="btn btn-primary">Редагувати</a>
+                            <a asp-action="Delete" asp-controller="Groups" asp-route-id="@item.Id" class="btn btn-danger">Видалити</a>
+
+                            @*<a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>*@
+                            @* @Html.ActionLink("Редагувати", "Edit", "Groups", new { id = @item.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+                            @Html.ActionLink("Видалити", "Delete", "Groups", new { id = @item.Id }, htmlAttributes: new { @class = "btn btn-danger" }) *@
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    </div>
+    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+        <a asp-action="Create" asp-controller="Teachers" class="btn btn-success ">
+            Створити
+        </a>
+        @*<p>
+            @Html.ActionLink("Створити", "Create", "Teachers", new { }, htmlAttributes: new { @class = "btn btn-success" })
+
+        </p>*@
+    <div class="scrollit">
+        <table class="table">
+            <thead>
+                <tr class="table-first-line">
+                    <th scope="col">
+                        Прізвище
+                    </th>
+                    <th scope="col">
+                        Ім'я
+                    </th>
+                    <th scope="col">
+                        По-Батькові
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in ViewBag.Teachers)
+                {
+                    <tr>
+                        <td>
+                            @item.LastName
+                        </td>
+                        <td>
+                            @item.Name
+                        </td>
+                        <td>
+                            @item.FutherName
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-controller="Teachers" asp-route-id="@item.Id" class="btn btn-primary">Редагувати</a>
+                            <a asp-action="Delete" asp-controller="Teachers" asp-route-id="@item.Id" class="btn btn-danger">Видалити</a>
+                            <!-- <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>-->
+                           @* @Html.ActionLink("Редагувати", "Edit", "Teachers", new { id = @item.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+                            @Html.ActionLink("Видалити", "Delete", "Teachers", new { id = @item.Id }, htmlAttributes: new { @class = "btn btn-danger" }) *@
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    </div>
+    <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+        <a asp-action="Create" asp-controller="Subjects" class="btn btn-success ">
+            Створити
+        </a>
+        @*<p>
+            @Html.ActionLink("Створити", "Create", "Subjects", new { }, htmlAttributes: new { @class = "btn btn-success" })
+
+        </p>*@
+        <div class="scrollit">
+            <table class="table">
+                <thead>
+                    <tr class="table-first-line">
+                        <th scope="col">
+                            Назва
+                        </th>
+                        <th scope="col">
+                            Курс
+                        </th>
+                        <th> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ViewBag.Subjects)
+                    {
+                        <tr>
+                            <td>
+                                @item.Name
+                            </td>
+                            <td>
+                                @item.Course
+                            </td>
+                            <td>
+                                <a asp-action="Edit" asp-controller="Subjects" asp-route-id="@item.Id" class="btn btn-primary">Редагувати</a>
+                                <a asp-action="Delete" asp-controller="Subjects" asp-route-id="@item.Id" class="btn btn-danger">Видалити</a>
+                                <!-- <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                            <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>-->
+                                @*    @Html.ActionLink("Редагувати", "Edit", "Subjects", new { id = @item.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+                                @Html.ActionLink("Видалити", "Delete", "Subjects", new { id = @item.Id }, htmlAttributes: new { @class = "btn btn-danger" })*@
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        </div>
+    <div class="tab-pane fade" id="pills-audience" role="tabpanel" aria-labelledby="pills-audience-tab">
+        <a asp-action="Create" asp-controller="Audiences" class="btn btn-success ">
+            Створити
+        </a>
+        @*<p>
+            @Html.ActionLink("Створити", "Create", "Audiences", new { }, htmlAttributes: new { @class = "btn btn-success" })
+
+        </p>*@
+        <div class="scrollit">
+            <table class="table">
+                <thead>
+                    <tr class="table-first-line">
+                        <th scope="col">
+                            Назва
+                        </th>
+                        <th scope="col">
+                            Вмістимість
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ViewBag.Audiences)
+                    {
+                        <tr>
+                            <td>
+                                @item.Name
+                            </td>
+                            <td>
+                                @item.Capacity
+                            </td>
+                            <td>
+                                <a asp-action="Edit" asp-controller="Audiences" asp-route-id="@item.Id" class="btn btn-primary">Редагувати</a>
+                                <a asp-action="Delete" asp-controller="Audiences" asp-route-id="@item.Id" class="btn btn-danger">Видалити</a>
+
+                                <!-- <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                            <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>-->
+                                @*     @Html.ActionLink("Редагувати", "Edit", "Audiences", new { id = @item.Id }, htmlAttributes: new { @class = "btn btn-primary" })
+                                @Html.ActionLink("Видалити", "Delete", "Audiences", new { id = @item.Id }, htmlAttributes: new { @class = "btn btn-danger" }) *@
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            </div>
+        </div>
+
+    </div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

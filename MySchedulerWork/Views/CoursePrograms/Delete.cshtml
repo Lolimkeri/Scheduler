@@ -1,0 +1,48 @@
+﻿@model MySchedulerWork.Models.CourseProgram
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Видалити</h1>
+
+
+<div class="border container" style="padding:30px;">
+    <h4>CourseProgram</h4>
+    <div class="form-group row">
+        <div class="col-3">
+            <label asp-for="Name"></label>
+        </div>
+        <div class="col-6">
+            @Html.DisplayFor(model => model.Name)
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-3">
+            <label asp-for="Course"></label>
+        </div>
+        <div class="col-6">
+            @Html.DisplayFor(model => model.Course)
+        </div>
+    </div>
+    @*<div class="form-group row">
+            <div class="col-3">
+                <label asp-for="Name"></label>
+            </div>
+            <div class="col-3">
+                <label asp-for="Course"></label>
+            </div>
+            <div class="col-6">
+                @Html.DisplayFor(model => model.Name)
+            </div>
+            <div class="col-6">
+                @Html.DisplayFor(model => model.Course)
+            </div>
+        </div>*@
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Видалити" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Назад</a>
+    </form>
+</div>
