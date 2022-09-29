@@ -1,0 +1,67 @@
+﻿@model MySchedulerWork.Models.Program_Subject
+
+@{
+    ViewData["Title"] = "Edit";
+    var model = ViewBag.Error;
+
+
+    var error = "";
+
+
+    if (model != null)
+    {
+
+        error = model.ErrorMessage;
+    }
+}
+
+
+<h1>Редагувати</h1>
+
+
+<hr />
+<div class="border container" style="padding:30px;">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group hidden">
+                <input name="courseId" class="form-control" type="text" value="@ViewBag.CourseId" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Предмет</label>
+                @Html.DropDownList("subjectId", ViewBag.Subjects as SelectList, "Виберіть предмет", new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                <label class="control-label">Тип</label>
+                <input asp-for="Type" name="type" class="form-control" />
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Викладач</label>
+                @Html.DropDownList("mainteacherId", ViewBag.Teachers as SelectList, new { @class = "form-control" })
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Асистент</label>
+                @Html.DropDownList("labteacherId", ViewBag.LabTeachers as SelectList, "Виберіть асистента", new { @class = "form-control" })
+            </div>
+            <span class="text-danger">@error</span>
+            <div class="form-group">
+                <input type="submit" value="Зберегти" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+
+    <form asp-controller="CoursePrograms" asp-action="Details" asp-route-id="@ViewBag.CourseId">
+        <div class="form-group">
+            <input type="submit" value="Return" class="btn btn-secondary" />
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

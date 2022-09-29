@@ -1,0 +1,56 @@
+﻿@model MySchedulerWork.Models.Pair
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+
+
+<h4>Редагувати</h4>
+<hr />
+<div class="border container" style="padding:30px;">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label class="control-label">Виберіть предмет</label>
+                @Html.DropDownList("subject", ViewBag.Subjects as SelectList, "Виберіть предмет", new { @class = "form-control" })
+                <span asp-validation-for="Day" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Виберіть аудиторію</label>
+                @Html.DropDownList("audience", ViewBag.Audiences as SelectList, "Виберіть аудиторію", new { @class = "form-control" })
+                <span asp-validation-for="Day" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="hidden" name="iseveryweek" value="@ViewBag.IsEveryWeek" />
+            </div><div class="form-group">
+                <input type="hidden" name="pairId" value="@ViewBag.PairId" />
+            </div>
+            <div class="form-group">
+                <input type="hidden" value="@ViewBag.Day" name="day" />
+            </div>
+            <div class="form-group">
+                <input type="hidden" value="@ViewBag.GroupId" name="group" />
+            </div>
+            <div class="form-group">
+                <input type="hidden" value="@ViewBag.Number" name="number" />
+            </div>
+            <div class="form-group">
+                <input type="hidden" value="@ViewBag.GroupToSend" name="sendedgroups" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Зберегти" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    @Html.ActionLink("Назад", "MoveToCreator", "Scheduler", new { sendedgroups = ViewBag.GroupToSend }, htmlAttributes: new { @class = "btn btn-secondary" })
+
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

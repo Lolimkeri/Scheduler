@@ -1,0 +1,56 @@
+﻿@model MySchedulerWork.Models.Teacher
+
+@{
+    ViewData["Title"] = "Edit";
+    var model = ViewBag.Error;
+
+
+    var error = "";
+
+
+    if (model != null)
+    {
+
+        error = model.ErrorMessage;
+    }
+}
+
+
+
+<h4>Редагувати</h4>
+<hr />
+<div class="border container" style="padding:30px;">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="LastName" class="control-label"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger">@error</span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FutherName" class="control-label"></label>
+                <input asp-for="FutherName" class="form-control" />
+                <span asp-validation-for="FutherName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Зберегти" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">На головну</a>
+    @*" @Html.ActionLink("Назад", "Index", "Home", new { }, htmlAttributes: new { @class = "btn btn-secondary" })*@
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

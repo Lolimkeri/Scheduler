@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Index";
+
+    var error = "";
+
+    if(ViewBag.Error != null)
+    {
+        error = ViewBag.Error;
+    }
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="MoveToCreator">
+            <!-- <div asp-validation-summary="ModelOnly" class="text-danger"></div>-->
+            <div class="form-group">
+                <label class="control-label">Виберіть програму</label>
+                @Html.DropDownList("programid", ViewBag.ProgramList as SelectList, "Виберіть курс", new { @class = "form-control", @onChange = "changeGroup()" })
+                <!--<span asp-validation-for="Name" class="text-danger"></span>-->
+            </div>
+            <div class="form-group">
+                <label class="control-label">Виберіть групи</label>
+                @Html.ListBox("groups", ViewBag.GroupList as MultiSelectList, new { @class = "form-control" })
+            </div>
+            <span class="text-danger">@error</span>
+            <div class="form-group">
+                <input type="submit" value="Створити" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>

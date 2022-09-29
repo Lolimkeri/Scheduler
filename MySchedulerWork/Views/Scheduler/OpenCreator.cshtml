@@ -1,0 +1,132 @@
+﻿@using MySchedulerWork.Controllers;
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Create</h1>
+<label>@ViewBag.CourseId</label>
+<div class="container">
+    <div class="row align-items-start">
+        <div class="col-sm-1 border"></div>
+        @{
+            List<Group> groups = ViewBag.Groups as List<Group>;
+            Dictionary<string, List<Pair>> dict = ViewBag.dict as Dictionary<string, List<Pair>>;
+            List<HasConflict> conf = ViewBag.Conflict;
+            @for (int i = 0; i < groups.Count; i++)
+            {
+                <div class="col border">@groups[i].Name</div>
+            }
+
+        }
+    </div>
+    @{
+        for (int i = 0; i < 5; i++)
+        {
+            <div class="row">
+                <div class="col-sm-12 text-center border border-dark">
+                    @ViewBag.Days[i]
+                </div>
+            </div>
+            for (int j = 0; j < 8; j++)
+            {
+                <div class="row align-items-start">
+                    <div class="col-sm-1 border blockpair">@ViewBag.TimeOfPairs[j]</div>
+
+
+                    @for (int k = 0; k < groups.Count; k++)
+                    {
+                        string key = @groups[k].Name;
+                        //Pair curPair = dict[key].FirstOrDefault(p => (int)p.Day == i && p.Number == j);
+                        var curPairs = dict[key].Where(p => (int)p.Day == i && p.Number == j).OrderBy(p => p.IsEverWeek).ToList();
+                        if (curPairs.Count == 0)
+                        {
+                            <div class="col border blockpair">
+                                @Html.ActionLink("Додати", "Create", "Pairs", new { groupId = groups[k].Id, day = i, number = j, returnGroup = ViewBag.GroupToSend }, htmlAttributes: new { @class = "btn btn-success" })
+                            </div>
+                        }
+                        else
+                        {
+                            if (curPairs.Count == 1)
+                            {
+                                HasConflict ifConf = conf.FirstOrDefault(p => p.Pair.Id == curPairs[0].Id);
+                                if (ifConf == null)
+                                {
+                                    <div class="col border blockpair" style="padding:0">
+                                        @if (curPairs[0].IsEverWeek == 0)
+                                        {
+                                            <div>@curPairs[0].Program_Subject.Subject.Name</div>
+                                        }
+                                        else
+                                        {
+                                            if (curPairs[0].IsEverWeek == 1)
+                                            {
+                                                <div class="blockpair-short border">@curPairs[0].Program_Subject.Subject.Name</div>
+                                                <div class="blockpair-short"></div>
+                                            }
+                                            else
+                                            {
+                                                <div class="blockpair-short border"></div>
+                                                <div class="blockpair-short">@curPairs[0].Program_Subject.Subject.Name</div>
+                                            }
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+
+                                    @if (curPairs[0].IsEverWeek == 0)
+                                    {
+                                        <div class="col border blockpair conflict">
+                                            @curPairs[0].Program_Subject.Subject.Name
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="col border blockpair" style="padding:0">
+                                            @if (curPairs[0].IsEverWeek == 1)
+                                            {
+                                                <div class="blockpair-short conflict border">@curPairs[0].Program_Subject.Subject.Name</div>
+                                                <div class="blockpair-short"></div>
+                                            }
+                                            else
+                                            {
+                                                <div class="blockpair-short border"></div>
+                                                <div class="blockpair-short conflict">@curPairs[0].Program_Subject.Subject.Name</div>
+                                            }
+                                        </div>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                HasConflict ifConf1 = conf.FirstOrDefault(p => p.Pair.Id == curPairs[0].Id);
+                                HasConflict ifConf2 = conf.FirstOrDefault(p => p.Pair.Id == curPairs[1].Id);
+                                <div class="col border blockpair">
+                                    @if (ifConf1 == null)
+                                    {
+                                        <div class="blockpair-short border">@curPairs[0].Program_Subject.Subject.Name</div>
+                                    }
+                                    else
+                                    {
+                                        <div class="blockpair-short conflict border">@curPairs[0].Program_Subject.Subject.Name</div>
+                                    }
+                                    @if (ifConf2 == null)
+                                    {
+                                        <div class="blockpair-short">@curPairs[1].Program_Subject.Subject.Name</div>
+                                    }
+                                    else
+                                    {
+                                        <div class="blockpair-short conflict">@curPairs[1].Program_Subject.Subject.Name</div>
+                                    }
+                                </div>
+                            }
+                        }
+                    }
+                </div>
+            }
+
+        }
+    }
+</div>
+
+<h4>Group</h4>
