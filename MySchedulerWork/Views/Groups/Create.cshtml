@@ -18,23 +18,23 @@
 
 <h4>Додати групу</h4>
 <hr />
-<div class="border container" style="padding:30px;">
+<div class="border container" style="padding: 30px; border: 2px solid #adafae !important">
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control"/>
+                <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger">@error</span>
             </div>
             <div class="form-group">
                 <label asp-for="Course" class="control-label"></label>
-                <input asp-for="Course" class="form-control"/>
+                <input asp-for="Course" class="form-control" />
                 <span asp-validation-for="Course" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="AmountOfStudents" class="control-label"></label>
-                <input asp-for="AmountOfStudents" class="form-control"/>
+                <input asp-for="AmountOfStudents" class="form-control" />
                 <span asp-validation-for="AmountOfStudents" class="text-danger"></span>
             </div>
             <div class="form-group">

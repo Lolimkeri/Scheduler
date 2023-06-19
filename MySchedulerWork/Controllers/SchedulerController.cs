@@ -7,21 +7,43 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System.Text.Json;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.AspNetCore.Http;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace MySchedulerWork.Controllers
 {
     public class SchedulerController : Controller
     {
         private readonly MyAppContext _context;
+
         public SchedulerController(MyAppContext context)
         {
             _context = context;
         }
+
         public IActionResult Index(string error = null)
         {
             ViewBag.ProgramList = new SelectList(_context.CourseProgram.ToArray(), "Id", "Name");
             ViewBag.GroupList = new MultiSelectList(_context.Groups.ToArray(), "Id", "Name");
             ViewBag.Error = error;
+
+            var stream = HttpContext.Session.GetString("JwToken");
+            var role = "";
+            var username = "";
+            if (!string.IsNullOrEmpty(stream))
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var token = handler.ReadToken(stream) as JwtSecurityToken;
+                role = token.Claims.First(claim => claim.Type == ClaimsIdentity.DefaultRoleClaimType).Value;
+                username = token.Claims.First(claim => claim.Type == ClaimsIdentity.DefaultNameClaimType).Value;
+            }
+
+            ViewBag.Username = username;
+            ViewBag.Role = role;
             return View();
         }
 
@@ -80,9 +102,11 @@ namespace MySchedulerWork.Controllers
                 groups.Add(_context.Groups.First(p => p.Id == groupsId[i]));
             ViewBag.CourseId = str;
             ViewBag.Groups = groups;
-            ViewBag.TimeOfPairs = new string[] { "8:30-9:50", "10:10-11:30", "11:50-13:10", "13:30-14:50", "15:05-16:25", "16:40-18:00", "18:10-19:30", "19:40-21:00" };
-            ViewBag.NameOfPairs = new string[] { "I", "II", "III", "IV", "V", "VI", "VII", "VIII" };
-            ViewBag.Days = new string[] { "Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця" };
+            ViewBag.TimeOfPairs = new List<string> { "8:30-9:50", "10:10-11:30", "11:50-13:10", "13:30-14:50", "15:05-16:25", "16:40-18:00", "18:10-19:30", "19:40-21:00" };
+            ViewBag.NameOfPairs = new List<string> { "I", "II", "III", "IV", "V", "VI", "VII", "VIII" };
+            ViewBag.Days = new List<string> { "Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця" };
+
+            //ViewBag.Days = new string[] { "Mon", "Tue", "Wed", "Thur", "Fri" };
 
             //  var pp = _context.PairToFGroup.Where(p => p.Group.Id==0);
             //  var ppp = groups[0].PairToFGroups[0].Pair.Program_Subject
@@ -210,8 +234,132 @@ namespace MySchedulerWork.Controllers
             }
             ViewBag.dict = dict;
             ViewBag.Conflict = hasConflict;
+
+            var stream = HttpContext.Session.GetString("JwToken");
+            var role = "";
+            var username = "";
+            if (!string.IsNullOrEmpty(stream))
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var token = handler.ReadToken(stream) as JwtSecurityToken;
+                role = token.Claims.First(claim => claim.Type == ClaimsIdentity.DefaultRoleClaimType).Value;
+                username = token.Claims.First(claim => claim.Type == ClaimsIdentity.DefaultNameClaimType).Value;
+            }
+
+            ViewBag.Username = username;
+            ViewBag.Role = role;
+
+            //Response.AddHeader("Content-type", "application/vnd,ms-excel");
+
             return View("Test");
         }
+
+        public FileResult ExportToCSV(List<int> groupsString, List<string> groupsOfDict, string pairsOfDictString, List<string> daysString, List<string> timeOfPairs)
+        {
+            var groups = new List<Group>();
+            foreach (var groupId in groupsString)
+            {
+                var group = _context.Groups.Where(g => g.Id == groupId).FirstOrDefault();
+                groups.Add(group);
+            }
+
+            List<List<int>> listPairs = JsonSerializer.Deserialize<List<List<int>>>(pairsOfDictString);
+            var dict = new Dictionary<string, List<Pair>>();
+
+            for (int i = 0; i < groupsOfDict.Count; i++)
+            {
+                var pairs = new List<Pair>();
+
+                foreach (var pairId in listPairs[i])
+                {
+                    var pair = _context.Pairs.Where(p => p.Id == pairId).FirstOrDefault();
+                    pairs.Add(pair);
+                }
+
+                dict[groupsOfDict[i]] = pairs;
+            }
+
+            var days = new List<string>();
+            foreach (var daysInitial in daysString)
+            {
+                switch (daysInitial)
+                {
+                    case "M":
+                        days.Add("Понеділок");
+                        break;
+                    case "T":
+                        days.Add("Вівторок");
+                        break;
+                    case "W":
+                        days.Add("Середа");
+                        break;
+                    case "Th":
+                        days.Add("Четвер");
+                        break;
+                    case "F":
+                        days.Add("П'ятниця");
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            var csvData = new StringBuilder();
+
+            // Додавання заголовків CSV
+            csvData.Append("Time");
+            foreach (var group in groups)
+            {
+                csvData.Append($",{group.Name}");
+            }
+
+            csvData.AppendLine();
+
+            for (int i = 0; i < days.Count; i++)
+            {
+                csvData.Append(days[i]);
+                csvData.AppendLine();
+                for (int j = 0; j < timeOfPairs.Count; j++)
+                {
+                    var time = timeOfPairs[j];
+                    csvData.Append($"{time},");
+
+                    for (int k = 0; k < groups.Count; k++)
+                    {
+                        string key = groups[k].Name;
+                        var curPairs = dict[key].Where(p => (int)p.Day == i && p.Number == j).OrderBy(p => p.IsEverWeek).FirstOrDefault();
+
+                        if (curPairs == null)
+                        {
+                            csvData.Append(string.Empty + ",");
+                        }
+                        else
+                        {
+                            var pairName = curPairs.Program_Subject.Subject.Name;
+                            var pairInfo = curPairs.NameOfPair;
+
+                            pairInfo = pairInfo.Replace(",", " ");
+
+                            csvData.Append(pairName + " " + pairInfo + ",");
+                        }
+                    }
+                    csvData.Remove(csvData.Length - 1, 1);
+
+                    csvData.AppendLine();
+                }
+
+                csvData.AppendLine();
+            }
+
+            // Параметри відповіді HTTP
+            var content = Encoding.UTF8.GetBytes(csvData.ToString());
+            string fileName = "data.csv";
+            string contentType = "text/csv; charset=utf-8";
+
+            // Відправка відповіді HTTP зі вмістом CSV-файлу
+            return File(content, contentType, fileName);
+        }
+
         public bool IfThisId(int id, int[] arr)
         {
             bool rez = false;

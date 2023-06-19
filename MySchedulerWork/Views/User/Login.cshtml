@@ -1,0 +1,117 @@
+﻿@{
+    ViewData["Title"] = "Login";
+
+    var model = ViewBag.UserModel;
+
+    var username = "";
+    var password = "";
+    var error = "";
+
+    if (model != null)
+    {
+        username = model.UserName;
+        password = model.Password;
+        error = model.Error;
+    }
+}
+
+<style type="text/css">
+
+    .main-c {
+        width: 100%;
+        height: 800px;
+    }
+
+    .b-fill {
+        width: 100%;
+        height: 100%;
+        background-image: url(https://www.99images.com/download-image/965319/4000x2501);
+        background-repeat: no-repeat;
+        background-size: cover;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .l-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        background: white;
+        border: 1px solid white;
+        border-radius: 20px;
+        min-width: 300px;
+        top: 300px;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        padding: 0px 20px 20px 20px;
+    }
+
+    .l-container-row {
+        display: flex;
+        align-items: center;
+    }
+
+    .l-container-input {
+        max-height: 70px;
+        margin-left: 20px;
+        border-radius: 5px;
+        border: 1px solid gray;
+    }
+
+        .l-container-input:hover {
+            border: 2px solid black;
+        }
+
+    .l-container-button {
+        width: 120px;
+        height: 25px;
+        background: gray;
+        color: white;
+        border-radius: 10px;
+        border: 1px solid gray;
+        margin-top: 10px;
+        margin-bottom: 20px;
+    }
+
+        .l-container-button:hover {
+            background: #2179d1;
+            border: 3px solid #2179d1;
+        }
+
+    .l-container-redirect {
+        font-size: 12px;
+        color: blue;
+    }
+
+    #login {
+        margin-left: 17px;
+    }
+
+    #pass {
+    }
+</style>
+
+<div class="main-c">
+    <div class="b-fill">
+        <form method="post" action="/User/LoginAction">
+            <div class="l-container">
+                <h2>Вхід</h2>
+                <div class="l-container-row">
+                    <p class="l-container-naming" id="login">Логін</p>
+                    <input name="username" class="l-container-input" value="@username">
+                </div>
+                <div class="l-container-row">
+                    <p class="l-container-naming" id="pass">Пароль</p>
+                    <input name="password" type="password" class="l-container-input" value="@password">
+                </div>
+                <div style="color:red">@error</div>
+                <button class="l-container-button"> Підтвердити </button>
+                <a href="/user/register" class="l-container-redirect">Немає аккаунту? Зареєструйтесь тут!</a>
+            </div>
+        </form>
+    </div>
+</div>

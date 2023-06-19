@@ -1,17 +1,83 @@
 ﻿@using MySchedulerWork.Controllers;
+@using System.Text.Json;
 @{
     ViewData["Title"] = "Index";
+
+    List<Group> groupsData = ViewBag.Groups;
+    Dictionary<string, List<Pair>> dictData = ViewBag.dict;
+    List<string> daysData = ViewBag.Days;
+    List<string> timeOfPairsData = ViewBag.TimeOfPairs;
+
+
+    var groupsParam = new List<int>();
+    foreach (var group in groupsData)
+    {
+        groupsParam.Add(group.Id);
+    }
+
+    var listPairs = new List<List<int>>();
+    var listKeysParam = new List<string>();
+
+    var dictParam = new Dictionary<string, List<int>>();
+    foreach (var keyValuePair in dictData)
+    {
+        var pairs = new List<int>();
+
+        foreach (var pair in keyValuePair.Value)
+        {
+            pairs.Add(pair.Id);
+        }
+
+        listPairs.Add(pairs);
+        listKeysParam.Add(keyValuePair.Key);
+
+        dictParam[keyValuePair.Key] = pairs;
+    }
+
+    var daysParam = new List<string>();
+    foreach (var daysName in daysData)
+    {
+        switch (daysName)
+        {
+            case "Понеділок":
+                daysParam.Add("M");
+                break;
+            case "Вівторок":
+                daysParam.Add("T");
+                break;
+            case "Середа":
+                daysParam.Add("W");
+                break;
+            case "Четвер":
+                daysParam.Add("Th");
+                break;
+            case "П'ятниця":
+                daysParam.Add("F");
+                break;
+            default:
+                break;
+        }
+    }
+
+    string listParam = JsonSerializer.Serialize<List<List<int>>>(listPairs);
 }
 
 <h1>Розклад</h1>
 <div class="container">
+    <div class="text-center" style="margin-bottom: 15px">
+        @using (Html.BeginForm("ExportToCSV", "Scheduler", FormMethod.Post))
+        {
+            <a href="@Url.Action("ExportToCSV", "Scheduler", new { groupsString = groupsParam, groupsOfDict = listKeysParam, pairsOfDictString = listParam, daysString = daysParam, timeOfPairs = timeOfPairsData })" class="btn btn-primary">Експортувати в CSV</a>
+        }
+        @*<a href="@Url.Action("ExportToCSV", "Scheduler", new { _groups = ViewBag.Groups, _dict = ViewBag.dict, _days = ViewBag.Days, _timeOfPairs = @ViewBag.TimeOfPairs })" class="btn btn-primary">Експортувати в CSV</a>*@
+    </div>
     <div class="row">
         <div class="col-sm-1 border"></div>
         @{
             List<Group> groups = ViewBag.Groups as List<Group>;
             Dictionary<string, List<Pair>> dict = ViewBag.dict as Dictionary<string, List<Pair>>;
             List<HasConflict> conf = ViewBag.Conflict;
-            @for (int i = groups.Count-1; i >= 0; i--)
+            @for (int i = 0; i < groups.Count; i++)
             {
                 <div class="col border">@groups[i].Name</div>
             }
@@ -35,19 +101,22 @@
                     </div>
 
 
-                    @for (int k = groups.Count-1; k >= 0; k--)
+                    @for (int k = 0; k < groups.Count; k++)
                     {
                         string key = @groups[k].Name;
                         //Pair curPair = dict[key].FirstOrDefault(p => (int)p.Day == i && p.Number == j);
                         var curPairs = dict[key].Where(p => (int)p.Day == i && p.Number == j).OrderBy(p => p.IsEverWeek).ToList();
-                        if (curPairs.Count == 0)
-                        {
-                            <div class="col border blockpair">
-                                <a href="@Url.Action("Create", "Pairs",new { groupId = groups[k].Id, day = i, number = j, returnGroup = ViewBag.GroupToSend } )" class="addpair-button">
-                                    <img src="~/images/add1.png" class="img-add" />
-                                </a>
+                        if(curPairs.Count == 0)                        
+                         {
+                        <div class="col border blockpair">
+                            @if(ViewBag.Role == "Admin") {
+                            <a href="@Url.Action("Create", "Pairs",new { groupId = groups[k].Id, day = i, number = j, returnGroup = ViewBag.GroupToSend } )" class="addpair-button">
+                                <img src="~/images/add1.png" class="img-add" />
+                            </a>
+                            }
 
-                            </div>
+
+                </div>
                         }
                         else
                         {
@@ -63,77 +132,90 @@
                                     {
                                         if (ifConf == null)
                                         {
-                                            <div class="blockpair h-100" style="padding-top:10px">
-                                                <p class="subjName">@curPairs[jj].Program_Subject.Subject.Name</p>
-                                                <p class="course-info">@curPairs[jj].NameOfPair</p>
+                                        <div class="blockpair h-100" style="padding-top:10px">
+                                            <p class="subjName">@curPairs[jj].Program_Subject.Subject.Name</p>
+                                            <p class="course-info">@curPairs[jj].NameOfPair</p>
+                                            @if (ViewBag.Role == "Admin"){
+                                            <a href="@Url.Action("Delete", "Pairs",new { id=curPairs[jj].Id , returnGroup = ViewBag.GroupToSend} )" class="addpair-button">
+                                                <img src="~/images/delete2.png" class="img-delete" />
+                                            </a>
 
-                                                <a href="@Url.Action("Delete", "Pairs",new { id=curPairs[jj].Id , returnGroup = ViewBag.GroupToSend} )" class="addpair-button">
-                                                    <img src="~/images/delete2.png" class="img-delete" />
-                                                </a>
+                                            <a href="@Url.Action("Edit", "Pairs",new {id=curPairs[jj].Id, groupId = groups[k].Id, day = i, number = j, returnGroup = ViewBag.GroupToSend } )" class="addpair-button">
+                                                <img src="~/images/edit3.png" class="img-edit" />
+                                            </a>
+                                            }
 
-                                                <a href="@Url.Action("Edit", "Pairs",new {id=curPairs[jj].Id, groupId = groups[k].Id, day = i, number = j, returnGroup = ViewBag.GroupToSend } )" class="addpair-button">
-                                                    <img src="~/images/edit3.png" class="img-edit" />
-                                                </a>
 
-                                            </div>
+                                        </div>
                                         }
                                         else
                                         {
-                                            <div class="blockpair conflict h-100" style="padding-top:10px">
-                                                <p class="subjName">@curPairs[jj].Program_Subject.Subject.Name</p>
-                                                <p class="course-info">@curPairs[jj].NameOfPair</p>
-                                                <div class="warn-holder-div">
-                                                    <img src="~/images/warn.png" class="img-warn" />
-                                                    <div class="warnblock">
-                                                        @ifConf.Message
-                                                    </div>
-                                                </div>
+                            <div class="blockpair conflict h-100" style="padding-top:10px">
+                                <p class="subjName">@curPairs[jj].Program_Subject.Subject.Name</p>
+                                <p class="course-info">@curPairs[jj].NameOfPair</p>
+                                <div class="warn-holder-div">
+                                    <img src="~/images/warn.png" class="img-warn" />
+                                    <div class="warnblock">
+                                        @ifConf.Message
+                                    </div>
+                                </div>
+                                @if (ViewBag.Role == "Admin")
+                                {
+                                    <a href="@Url.Action("Delete", "Pairs",new { id=curPairs[jj].Id , returnGroup = ViewBag.GroupToSend} )" class="addpair-button">
+                                        <img src="~/images/delete2.png" class="img-delete" />
+                                    </a>
 
-                                                <a href="@Url.Action("Delete", "Pairs",new { id=curPairs[jj].Id , returnGroup = ViewBag.GroupToSend} )" class="addpair-button">
-                                                    <img src="~/images/delete2.png" class="img-delete" />
-                                                </a>
+                                    <a href="@Url.Action("Edit", "Pairs",new {id=curPairs[jj].Id, groupId = groups[k].Id, day = i, number = j, returnGroup = ViewBag.GroupToSend } )" class="addpair-button">
+                                        <img src="~/images/edit3.png" class="img-edit" />
+                                    </a>
+                                }
 
-                                                <a href="@Url.Action("Edit", "Pairs",new {id=curPairs[jj].Id, groupId = groups[k].Id, day = i, number = j, returnGroup = ViewBag.GroupToSend } )" class="addpair-button">
-                                                    <img src="~/images/edit3.png" class="img-edit" />
-                                                </a>
-                                            </div>
+                            </div>
                                         }
                                     }
                                     if (curPairs[jj].IsEverWeek == 1)
                                     {
                                         if (ifConf == null)
                                         {
-                                            <div class="blockpair-short border-bottom">
-                                                <p class="subjName">@curPairs[jj].Program_Subject.Subject.Name</p>
-                                                <p class="course-info">@curPairs[jj].NameOfPair</p>
-                                                <a href="@Url.Action("Delete", "Pairs",new { id=curPairs[jj].Id , returnGroup = ViewBag.GroupToSend} )" class="addpair-button">
-                                                    <img src="~/images/delete2.png" class="img-delete" />
-                                                </a>
+                            <div class="blockpair-short border-bottom">
+                                <p class="subjName">@curPairs[jj].Program_Subject.Subject.Name</p>
+                                <p class="course-info">@curPairs[jj].NameOfPair</p>
+                                @if (ViewBag.Role == "Admin")
+                                {
+                                    <a href="@Url.Action("Delete", "Pairs",new { id=curPairs[jj].Id , returnGroup = ViewBag.GroupToSend} )" class="addpair-button">
+                                        <img src="~/images/delete2.png" class="img-delete" />
+                                    </a>
 
-                                                <a href="@Url.Action("Edit", "Pairs",new {id=curPairs[jj].Id, groupId = groups[k].Id, day = i, number = j, returnGroup = ViewBag.GroupToSend } )" class="addpair-button">
-                                                    <img src="~/images/edit3.png" class="img-edit" />
-                                                </a>
-                                            </div>
+                                    <a href="@Url.Action("Edit", "Pairs",new {id=curPairs[jj].Id, groupId = groups[k].Id, day = i, number = j, returnGroup = ViewBag.GroupToSend } )" class="addpair-button">
+                                        <img src="~/images/edit3.png" class="img-edit" />
+                                    </a>
+                                }
+
+                            </div>
                                         }
                                         else
                                         {
-                                            <div class="col border-bottom blockpair conflict">
-                                                <p class="subjName">@curPairs[jj].Program_Subject.Subject.Name</p>
-                                                <p class="course-info">@curPairs[jj].NameOfPair</p>
-                                                <div class="warn-holder-div">
-                                                    <img src="~/images/warn.png" class="img-warn" />
-                                                    <div class="warnblock">
-                                                        @ifConf.Message
-                                                    </div>
-                                                </div>
-                                                <a href="@Url.Action("Delete", "Pairs",new { id=curPairs[jj].Id , returnGroup = ViewBag.GroupToSend} )" class="addpair-button">
-                                                    <img src="~/images/delete2.png" class="img-delete" />
-                                                </a>
+                            <div class="col border-bottom blockpair conflict">
+                                <p class="subjName">@curPairs[jj].Program_Subject.Subject.Name</p>
+                                <p class="course-info">@curPairs[jj].NameOfPair</p>
+                                <div class="warn-holder-div">
+                                    <img src="~/images/warn.png" class="img-warn" />
+                                    <div class="warnblock">
+                                        @ifConf.Message
+                                    </div>
+                                </div>
+                                @if (ViewBag.Role == "Admin")
+                                {
+                                    <a href="@Url.Action("Delete", "Pairs",new { id=curPairs[jj].Id , returnGroup = ViewBag.GroupToSend} )" class="addpair-button">
+                                        <img src="~/images/delete2.png" class="img-delete" />
+                                    </a>
 
-                                                <a href="@Url.Action("Edit", "Pairs",new {id=curPairs[jj].Id, groupId = groups[k].Id, day = i, number = j, returnGroup = ViewBag.GroupToSend } )" class="addpair-button">
-                                                    <img src="~/images/edit3.png" class="img-edit" />
-                                                </a>
-                                            </div>
+                                    <a href="@Url.Action("Edit", "Pairs",new {id=curPairs[jj].Id, groupId = groups[k].Id, day = i, number = j, returnGroup = ViewBag.GroupToSend } )" class="addpair-button">
+                                        <img src="~/images/edit3.png" class="img-edit" />
+                                    </a>
+                                }
+
+                            </div>
                                         }
                                         setFirstSmallBlock = true;
                                     }
@@ -141,25 +223,33 @@
                                     {
                                         if (!setFirstSmallBlock)
                                         {
-                                            <div class="blockpair-short border-bottom">
-                                                <a href="@Url.Action("Create", "Pairs",new { groupId = groups[k].Id, day = i, number = j, returnGroup = ViewBag.GroupToSend, IsEveryWeek = 1 } )" class="addpair-button">
-                                                    <img src="~/images/add1.png" class="img-add" />
-                                                </a>
-                                            </div>
+                            <div class="blockpair-short border-bottom">
+                                @if (ViewBag.Role == "Admin")
+                                        {
+                                            <a href="@Url.Action("Create", "Pairs",new { groupId = groups[k].Id, day = i, number = j, returnGroup = ViewBag.GroupToSend, IsEveryWeek = 1 } )" class="addpair-button">
+                                                <img src="~/images/add1.png" class="img-add" />
+                                            </a>
+                                        }
+                                    
+                            </div>
                                         }
                                         if (ifConf == null)
                                         {
-                                            <div class="blockpair-short">
-                                                <p class="subjName">@curPairs[jj].Program_Subject.Subject.Name</p>
-                                                <p class="course-info">@curPairs[jj].NameOfPair</p>
-                                                <a href="@Url.Action("Delete", "Pairs",new { id=curPairs[jj].Id , returnGroup = ViewBag.GroupToSend} )" class="addpair-button">
-                                                    <img src="~/images/delete2.png" class="img-delete" />
-                                                </a>
+                            <div class="blockpair-short">
+                                <p class="subjName">@curPairs[jj].Program_Subject.Subject.Name</p>
+                                <p class="course-info">@curPairs[jj].NameOfPair</p>
+                                @if (ViewBag.Role == "Admin")
+                                {
+                                    <a href="@Url.Action("Delete", "Pairs",new { id=curPairs[jj].Id , returnGroup = ViewBag.GroupToSend} )" class="addpair-button">
+                                        <img src="~/images/delete2.png" class="img-delete" />
+                                    </a>
 
-                                                <a href="@Url.Action("Edit", "Pairs",new {id=curPairs[jj].Id, groupId = groups[k].Id, day = i, number = j, returnGroup = ViewBag.GroupToSend } )" class="addpair-button">
-                                                    <img src="~/images/edit3.png" class="img-edit" />
-                                                </a>
-                                            </div>
+                                    <a href="@Url.Action("Edit", "Pairs",new {id=curPairs[jj].Id, groupId = groups[k].Id, day = i, number = j, returnGroup = ViewBag.GroupToSend } )" class="addpair-button">
+                                        <img src="~/images/edit3.png" class="img-edit" />
+                                    </a>
+                                }
+
+                            </div>
                                         }
                                         else
                                         {
@@ -172,13 +262,17 @@
                                         @ifConf.Message
                                     </div>
                                 </div>
-                                <a href="@Url.Action("Delete", "Pairs",new { id=curPairs[jj].Id , returnGroup = ViewBag.GroupToSend} )" class="addpair-button">
-                                    <img src="~/images/delete2.png" class="img-delete" />
-                                </a>
+                                @if (ViewBag.Role == "Admin")
+                                {
+                                    <a href="@Url.Action("Delete", "Pairs",new { id=curPairs[jj].Id , returnGroup = ViewBag.GroupToSend} )" class="addpair-button">
+                                        <img src="~/images/delete2.png" class="img-delete" />
+                                    </a>
 
-                                <a href="@Url.Action("Edit", "Pairs",new {id=curPairs[jj].Id, groupId = groups[k].Id, day = i, number = j, returnGroup = ViewBag.GroupToSend } )" class="addpair-button">
-                                    <img src="~/images/edit3.png" class="img-edit" />
-                                </a>
+                                    <a href="@Url.Action("Edit", "Pairs",new {id=curPairs[jj].Id, groupId = groups[k].Id, day = i, number = j, returnGroup = ViewBag.GroupToSend } )" class="addpair-button">
+                                        <img src="~/images/edit3.png" class="img-edit" />
+                                    </a>
+                                }
+
                             </div>
                                         }
                                         setSecondSmallBlock = true;
@@ -186,11 +280,15 @@
                                 }
                                 @if (!setSecondSmallBlock && needTwoBlock)
                                 {
-                                    <div class="blockpair-short">
-                                        <a href="@Url.Action("Create", "Pairs",new { groupId = groups[k].Id, day = i, number = j, returnGroup = ViewBag.GroupToSend, IsEveryWeek = 2 } )" class="addpair-button">
-                                            <img src="~/images/add1.png" class="img-add" />
-                                        </a>
-                                    </div>
+                            <div class="blockpair-short">
+                                @if (ViewBag.Role == "Admin")
+                                {
+                                    <a href="@Url.Action("Create", "Pairs",new { groupId = groups[k].Id, day = i, number = j, returnGroup = ViewBag.GroupToSend, IsEveryWeek = 2 } )" class="addpair-button">
+                                        <img src="~/images/add1.png" class="img-add" />
+                                    </a>
+                                }
+
+                            </div>
                                 }
                             </div>
                         }

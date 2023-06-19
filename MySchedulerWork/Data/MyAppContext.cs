@@ -9,6 +9,7 @@ namespace MySchedulerWork.Data
 {
     public class MyAppContext : DbContext
     {
+        public DbSet<User> Users { get; set; }
         public DbSet<Teacher> Teachers { get; set; }
         public DbSet<Audience> Audiences { get; set; }
         public DbSet<Group> Groups { get; set; }
@@ -25,6 +26,21 @@ namespace MySchedulerWork.Data
         {
             //Database.EnsureDeleted();
             Database.EnsureCreated();
+
+            AddMockedData();
+        }
+
+        private void AddMockedData()
+        {
+            Users.Add(new User()
+            {
+                UserName = "hello",
+                Email = "hello@gmail.com",
+                Password = "hello",
+                Role = "Admin"
+            });
+
+            SaveChanges();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

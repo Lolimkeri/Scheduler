@@ -1,0 +1,36 @@
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Http
+@using System.IdentityModel.Tokens.Jwt;
+
+@{
+    var stream = Context.Session.GetString("JwToken");
+    var userName = "";
+    if (!string.IsNullOrEmpty(stream))
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var token = handler.ReadToken(stream) as JwtSecurityToken;
+        userName = token.Claims.First(claim => claim.Type == ClaimsIdentity.DefaultNameClaimType).Value;
+    }
+}
+
+@if (!string.IsNullOrEmpty(userName))
+{
+
+    using (Html.BeginForm("LogOff", "User", FormMethod.Post, new { id = "logoutForm", style = "color: #343a40 !important;" }))
+    {
+
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                @userName
+            </li>
+            <li><a style="color: #343a40 !important; margin-left: 20px" href="javascript:document.getElementById('logoutForm').submit()">Вийти</a></li>
+        </ul>
+    }
+}
+else
+{
+    <ul class="nav navbar-nav navbar-right">
+        <li>@Html.ActionLink("Реєстрація", "Register", "User", routeValues: null, htmlAttributes: new { id = "registerLink", style = "color: #343a40 !important; margin-right: 20px;" })</li>
+        <li>@Html.ActionLink("Вхід", "Login", "User", routeValues: null, htmlAttributes: new { id = "loginLink", style = "color: #343a40 !important;" })</li>
+    </ul>
+}

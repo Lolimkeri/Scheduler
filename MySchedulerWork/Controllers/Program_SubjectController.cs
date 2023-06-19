@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using MySchedulerWork.Data;
 using MySchedulerWork.Models;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.AspNetCore.Http;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace MySchedulerWork.Controllers
 {
@@ -24,6 +27,20 @@ namespace MySchedulerWork.Controllers
         // GET: Program_Subject
         public async Task<IActionResult> Index()
         {
+            var stream = HttpContext.Session.GetString("JwToken");
+            var role = "";
+            var username = "";
+            if (!string.IsNullOrEmpty(stream))
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var token = handler.ReadToken(stream) as JwtSecurityToken;
+                role = token.Claims.First(claim => claim.Type == ClaimsIdentity.DefaultRoleClaimType).Value;
+                username = token.Claims.First(claim => claim.Type == ClaimsIdentity.DefaultNameClaimType).Value;
+            }
+
+            ViewBag.Username = username;
+            ViewBag.Role = role;
+
             return View(await _context.Program_Subjects.ToListAsync());
         }
 

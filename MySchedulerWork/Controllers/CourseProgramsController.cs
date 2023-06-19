@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +25,20 @@ namespace MySchedulerWork.Controllers
         // GET: CoursePrograms
         public async Task<IActionResult> Index()
         {
+            var stream = HttpContext.Session.GetString("JwToken");
+            var role = "";
+            var username = "";
+            if (!string.IsNullOrEmpty(stream))
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var token = handler.ReadToken(stream) as JwtSecurityToken;
+                role = token.Claims.First(claim => claim.Type == ClaimsIdentity.DefaultRoleClaimType).Value;
+                username = token.Claims.First(claim => claim.Type == ClaimsIdentity.DefaultNameClaimType).Value;
+            }
+
+            ViewBag.Username = username;
+            ViewBag.Role = role;
+
             ViewBag.CoursePrograms = await _context.CourseProgram.ToListAsync();
             return View();
         }
@@ -29,6 +46,20 @@ namespace MySchedulerWork.Controllers
         // GET: CoursePrograms/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            var stream = HttpContext.Session.GetString("JwToken");
+            var role = "";
+            var username = "";
+            if (!string.IsNullOrEmpty(stream))
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var token = handler.ReadToken(stream) as JwtSecurityToken;
+                role = token.Claims.First(claim => claim.Type == ClaimsIdentity.DefaultRoleClaimType).Value;
+                username = token.Claims.First(claim => claim.Type == ClaimsIdentity.DefaultNameClaimType).Value;
+            }
+
+            ViewBag.Username = username;
+            ViewBag.Role = role;
+
             if (id == null)
             {
                 return NotFound();
@@ -64,6 +95,20 @@ namespace MySchedulerWork.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateProgToGroup()
         {
+            var stream = HttpContext.Session.GetString("JwToken");
+            var role = "";
+            var username = "";
+            if (!string.IsNullOrEmpty(stream))
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var token = handler.ReadToken(stream) as JwtSecurityToken;
+                role = token.Claims.First(claim => claim.Type == ClaimsIdentity.DefaultRoleClaimType).Value;
+                username = token.Claims.First(claim => claim.Type == ClaimsIdentity.DefaultNameClaimType).Value;
+            }
+
+            ViewBag.Username = username;
+            ViewBag.Role = role;
+
             int CourseId = Convert.ToInt32(Request.Form["courseid"]);
             if (Request.Form["groupid"] != "")
             {
@@ -88,6 +133,20 @@ namespace MySchedulerWork.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteProgrameToGroup()
         {
+            var stream = HttpContext.Session.GetString("JwToken");
+            var role = "";
+            var username = "";
+            if (!string.IsNullOrEmpty(stream))
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var token = handler.ReadToken(stream) as JwtSecurityToken;
+                role = token.Claims.First(claim => claim.Type == ClaimsIdentity.DefaultRoleClaimType).Value;
+                username = token.Claims.First(claim => claim.Type == ClaimsIdentity.DefaultNameClaimType).Value;
+            }
+
+            ViewBag.Username = username;
+            ViewBag.Role = role;
+
             int id =Convert.ToInt32(Request.Form["idGr"]);
             int returnid = Convert.ToInt32(Request.Form["returnid"]); ;
             /*var programToGroup = await _context.ProgramToGroups
